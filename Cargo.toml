@@ -1,8 +1,9 @@
 [package]
-name = "todo-app"
+name = "stack-rs"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 huff_utils = { path = "huff-rs/huff_utils" }
 huff_core = { path = "huff-rs/huff_core" }
+ratatui = "0.29.0"
