@@ -3,7 +3,9 @@ mod structs;
 mod tui;
 
 use evm::EVM;
-use structs::{calldata::Calldata, memory::Memory, stack::Stack, storage::Storage};
+use structs::{
+    calldata::Calldata, memory::Memory, opcodes::OPCODES, stack::Stack, storage::Storage,
+};
 use tui::render;
 
 use huff_core::Compiler;
@@ -54,7 +56,7 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     terminal.clear()?;
 
-    let mut execution_context = EVM::default(&compiled_bytecode);
+    let mut execution_context = EVM::default(compiled_bytecode);
     let __ = render::render(terminal, &mut execution_context);
 
     ratatui::restore();

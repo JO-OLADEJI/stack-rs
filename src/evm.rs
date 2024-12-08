@@ -2,6 +2,7 @@ use crate::Calldata;
 use crate::Memory;
 use crate::Stack;
 use crate::Storage;
+use crate::OPCODES;
 
 pub enum BytecodeExecutionTrail {
     Left(usize),
@@ -20,9 +21,9 @@ pub struct EVM {
 }
 
 impl EVM {
-    pub fn default(bytecode: &str) -> EVM {
+    pub fn default(bytecode: String) -> EVM {
         EVM {
-            bytecode: String::from(bytecode),
+            bytecode,
             opcode_index: 0,
             stack: Stack::default(),
             memory: Memory::default(),
@@ -32,7 +33,7 @@ impl EVM {
     }
 
     pub fn new(
-        bytecode: &str,
+        bytecode: String,
         calldata: Calldata,
         memory: Option<Memory>,
         storage: Option<Storage>,
@@ -73,7 +74,7 @@ impl EVM {
         }
 
         EVM {
-            bytecode: String::from(bytecode),
+            bytecode,
             calldata,
             opcode_index: 0,
             memory: defined_memory,
@@ -110,3 +111,5 @@ impl EVM {
         }
     }
 }
+
+// impl OPCODES for EVM {}
