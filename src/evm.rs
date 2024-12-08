@@ -3,10 +3,15 @@ use crate::Memory;
 use crate::Stack;
 use crate::Storage;
 
+pub enum BytecodeExecutionTrail {
+    Left(usize),
+    Right(usize),
+}
+
 #[derive(Debug)]
 pub struct EVM {
     bytecode: String,
-    opcode_index: u64,
+    opcode_index: usize,
 
     stack: Stack,
     memory: Memory,
@@ -74,6 +79,34 @@ impl EVM {
             memory: defined_memory,
             storage: defined_storage,
             stack: defined_stack,
+        }
+    }
+
+    pub fn get_bytecode(&self) -> &String {
+        &self.bytecode
+    }
+
+    pub fn get_opcode_index(&self) -> usize {
+        self.opcode_index
+    }
+
+    pub fn update_opcode_index(&mut self, command: BytecodeExecutionTrail) {
+        match command {
+            BytecodeExecutionTrail::Left(magnitude) => {
+                if magnitude > self.opcode_index {
+                    self.opcode_index = 0
+                } else {
+                    self.opcode_index -= magnitude
+                };
+            }
+
+            BytecodeExecutionTrail::Right(magnitude) => {
+                if self.opcode_index + magnitude > self.bytecode.len() {
+                    self.opcode_index = self.bytecode.len()
+                } else {
+                    self.opcode_index += magnitude
+                }
+            }
         }
     }
 }

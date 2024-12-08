@@ -1,18 +1,13 @@
 mod evm;
 mod structs;
+mod tui;
 
 use evm::EVM;
 use structs::{calldata::Calldata, memory::Memory, stack::Stack, storage::Storage};
+use tui::render;
 
 use huff_core::Compiler;
 use huff_utils::evm_version::EVMVersion;
-use ratatui::{
-    crossterm::event::{self, Event::Key, KeyCode, KeyEventKind},
-    layout::Alignment,
-    style::{Style, Stylize},
-    widgets::{Block, Padding, Paragraph, Wrap},
-    DefaultTerminal,
-};
 use std::{
     io::{self, Write},
     sync::Arc,
@@ -59,36 +54,9 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     terminal.clear()?;
 
-    let execution_context = EVM::default(&compiled_bytecode);
-    let __ = render(terminal, &compiled_bytecode);
+    let mut execution_context = EVM::default(&compiled_bytecode);
+    let __ = render::render(terminal, &mut execution_context);
 
     ratatui::restore();
     __
-}
-
-fn render(mut terminal: DefaultTerminal, bytecode: &String) -> io::Result<()> {
-    loop {
-        terminal.draw(|frame| {
-            let display = Paragraph::new(&bytecode[..])
-                .block(
-                    Block::bordered()
-                        .title("  bytecode ")
-                        .title_alignment(Alignment::Center)
-                        .title_style(Style::new().bold())
-                        .padding(Padding::horizontal(2)),
-                )
-                .wrap(Wrap { trim: true })
-                .white();
-            frame.render_widget(display, frame.area());
-        })?;
-
-        if let Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::Char('q') => return Ok(()),
-                    _ => (),
-                }
-            }
-        }
-    }
 }
