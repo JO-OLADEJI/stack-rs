@@ -1,3 +1,9 @@
+mod evm;
+mod structs;
+
+use evm::EVM;
+use structs::{calldata::Calldata, memory::Memory, stack::Stack, storage::Storage};
+
 use huff_core::Compiler;
 use huff_utils::evm_version::EVMVersion;
 use ratatui::{
@@ -52,6 +58,8 @@ fn main() -> io::Result<()> {
 
     let mut terminal = ratatui::init();
     terminal.clear()?;
+
+    let execution_context = EVM::default(&compiled_bytecode);
     let __ = render(terminal, &compiled_bytecode);
 
     ratatui::restore();
@@ -75,8 +83,11 @@ fn render(mut terminal: DefaultTerminal, bytecode: &String) -> io::Result<()> {
         })?;
 
         if let Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                return Ok(());
+            if key.kind == KeyEventKind::Press {
+                match key.code {
+                    KeyCode::Char('q') => return Ok(()),
+                    _ => (),
+                }
             }
         }
     }
