@@ -5,26 +5,28 @@ use crate::Storage;
 use crate::OPCODES;
 
 pub enum BytecodeExecutionTrail {
-    Left(usize),
-    Right(usize),
+    Left,
+    Right,
 }
 
 #[derive(Debug)]
 pub struct EVM {
     bytecode: String,
-    opcode_index: usize,
+    program_counter: usize,
+    command_length: usize,
 
-    stack: Stack,
-    memory: Memory,
-    calldata: Calldata,
-    storage: Storage,
+    pub stack: Stack,
+    pub memory: Memory,
+    pub calldata: Calldata,
+    pub storage: Storage,
 }
 
 impl EVM {
     pub fn default(bytecode: String) -> EVM {
         EVM {
             bytecode,
-            opcode_index: 0,
+            command_length: 2,
+            program_counter: 0,
             stack: Stack::default(),
             memory: Memory::default(),
             calldata: Calldata::default(),
@@ -76,7 +78,8 @@ impl EVM {
         EVM {
             bytecode,
             calldata,
-            opcode_index: 0,
+            command_length: 2,
+            program_counter: 0,
             memory: defined_memory,
             storage: defined_storage,
             stack: defined_stack,
@@ -87,29 +90,196 @@ impl EVM {
         &self.bytecode
     }
 
-    pub fn get_opcode_index(&self) -> usize {
-        self.opcode_index
+    pub fn get_program_counter(&self) -> usize {
+        self.program_counter
     }
 
-    pub fn update_opcode_index(&mut self, command: BytecodeExecutionTrail) {
+    pub fn get_command_length(&self) -> usize {
+        self.command_length
+    }
+
+    pub fn execute_opcode(&mut self, opcode: &str) -> Result<usize, ()> {
+        let payload_size: usize;
+        let i = self.program_counter + self.command_length;
+
+        if opcode == "5f" {
+            self.PUSH0();
+            payload_size = 0;
+        } else if opcode == "63" {
+            payload_size = 8;
+            let payload = self.bytecode[i..i + payload_size].to_string();
+
+            self.PUSH4(&payload);
+        } else if opcode == "73" {
+            payload_size = 40;
+            let payload = self.bytecode[i..i + payload_size].to_string();
+
+            self.PUSH20(&payload);
+        } else {
+            payload_size = 0;
+        }
+
+        Ok(payload_size)
+    }
+
+    pub fn update_program_counter(&mut self, command: BytecodeExecutionTrail) {
+        let current_opcode = self.bytecode
+            [self.program_counter..self.program_counter + self.command_length]
+            .to_string();
+
         match command {
-            BytecodeExecutionTrail::Left(magnitude) => {
-                if magnitude > self.opcode_index {
-                    self.opcode_index = 0
-                } else {
-                    self.opcode_index -= magnitude
-                };
+            BytecodeExecutionTrail::Left => {
+                self.program_counter =
+                    self.program_counter.max(self.command_length) - self.command_length;
             }
 
-            BytecodeExecutionTrail::Right(magnitude) => {
-                if self.opcode_index + magnitude > self.bytecode.len() {
-                    self.opcode_index = self.bytecode.len()
-                } else {
-                    self.opcode_index += magnitude
+            BytecodeExecutionTrail::Right => {
+                let res = self.execute_opcode(&current_opcode);
+                match res {
+                    Ok(payload_size) => {
+                        self.program_counter =
+                            (self.program_counter + self.command_length + payload_size)
+                                .min(self.bytecode.len() - self.command_length)
+                    }
+                    _ => (),
                 }
             }
         }
     }
 }
 
-// impl OPCODES for EVM {}
+// 5f63ab12cd3473b2052eb9730b6afec7ae47b5bffe492c0c0e511b00
+
+impl OPCODES for EVM {
+    fn PUSH0(&mut self) {
+        let _ = self.stack.push(&String::from("0"));
+    }
+
+    fn PUSH1(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH2(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH3(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH4(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH5(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH6(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH7(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH8(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH9(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH10(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH11(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH12(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH13(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH14(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH15(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH16(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH17(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH18(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH19(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH20(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH21(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH22(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH23(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH24(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH25(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH26(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH27(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH28(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH29(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH30(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH31(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+
+    fn PUSH32(&mut self, value: &str) {
+        let _ = self.stack.push(&value);
+    }
+}

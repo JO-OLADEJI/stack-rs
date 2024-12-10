@@ -1,6 +1,7 @@
 mod evm;
 mod structs;
 mod tui;
+mod utils;
 
 use evm::EVM;
 use structs::{
@@ -16,9 +17,9 @@ use std::{
 };
 
 fn main() -> io::Result<()> {
-    let mut sources: Vec<String> = Vec::new();
     let mut file_path = String::new();
     let evm_version = EVMVersion::default();
+    let mut sources: Vec<String> = Vec::new();
     let mut compiled_bytecode = String::new();
 
     print!("source: ");
@@ -45,7 +46,7 @@ fn main() -> io::Result<()> {
     let result = compiler.execute();
     match result {
         Ok(artifact) => {
-            compiled_bytecode.push_str(&artifact[0].bytecode[..]);
+            compiled_bytecode.push_str(&artifact[0].runtime[..]);
         }
 
         Err(error) => {
