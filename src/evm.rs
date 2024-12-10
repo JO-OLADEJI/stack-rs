@@ -14,6 +14,7 @@ pub struct EVM {
     bytecode: String,
     program_counter: usize,
     command_length: usize,
+    pub pc_history: Vec<usize>,
 
     pub stack: Stack,
     pub memory: Memory,
@@ -27,7 +28,8 @@ impl EVM {
             bytecode,
             command_length: 2,
             program_counter: 0,
-            stack: Stack::default(),
+            pc_history: Vec::new(),
+            stack: Stack::new(),
             memory: Memory::default(),
             calldata: Calldata::default(),
             storage: Storage::default(),
@@ -71,7 +73,7 @@ impl EVM {
             }
 
             None => {
-                defined_stack = Stack::default();
+                defined_stack = Stack::new();
             }
         }
 
@@ -80,6 +82,7 @@ impl EVM {
             calldata,
             command_length: 2,
             program_counter: 0,
+            pc_history: Vec::new(),
             memory: defined_memory,
             storage: defined_storage,
             stack: defined_stack,
@@ -98,6 +101,43 @@ impl EVM {
         self.command_length
     }
 
+    pub fn update_program_counter(&mut self, command: BytecodeExecutionTrail) {
+        let current_opcode = self.bytecode
+            [self.program_counter..self.program_counter + self.command_length]
+            .to_string();
+
+        match command {
+            BytecodeExecutionTrail::Left => {
+                let prev_index = self.pc_history.last();
+
+                if let Some(value) = prev_index {
+                    let _ = self.stack.undo();
+                    self.program_counter = value.clone();
+                    self.pc_history.pop();
+                }
+            }
+
+            BytecodeExecutionTrail::Right => {
+                let res = self.execute_opcode(&current_opcode);
+
+                match res {
+                    Ok(payload_size) => {
+                        let pc_cache = (self.program_counter + self.command_length + payload_size)
+                            .min(self.bytecode.len() - self.command_length);
+
+                        if self.program_counter != pc_cache {
+                            self.pc_history.push(self.program_counter);
+                            self.program_counter = pc_cache;
+                        }
+                    }
+                    _ => (),
+                }
+            }
+        }
+    }
+}
+
+impl EVM {
     pub fn execute_opcode(&mut self, opcode: &str) -> Result<usize, ()> {
         let payload_size: usize;
         let i = self.program_counter + self.command_length;
@@ -121,34 +161,7 @@ impl EVM {
 
         Ok(payload_size)
     }
-
-    pub fn update_program_counter(&mut self, command: BytecodeExecutionTrail) {
-        let current_opcode = self.bytecode
-            [self.program_counter..self.program_counter + self.command_length]
-            .to_string();
-
-        match command {
-            BytecodeExecutionTrail::Left => {
-                self.program_counter =
-                    self.program_counter.max(self.command_length) - self.command_length;
-            }
-
-            BytecodeExecutionTrail::Right => {
-                let res = self.execute_opcode(&current_opcode);
-                match res {
-                    Ok(payload_size) => {
-                        self.program_counter =
-                            (self.program_counter + self.command_length + payload_size)
-                                .min(self.bytecode.len() - self.command_length)
-                    }
-                    _ => (),
-                }
-            }
-        }
-    }
 }
-
-// 5f63ab12cd3473b2052eb9730b6afec7ae47b5bffe492c0c0e511b00
 
 impl OPCODES for EVM {
     fn PUSH0(&mut self) {
