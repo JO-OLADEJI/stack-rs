@@ -157,10 +157,10 @@ pub trait OPCODES {
     // /// stack output - value]
     // fn CALLVALUE(&mut self);
 
-    // /// Get input data of current environment
-    // /// stack input - i]
-    // /// stack output - data[i:i+32]]
-    // fn CALLDATALOAD(&mut self);
+    /// Get input data of current environment
+    /// stack input - i]
+    /// stack output - data[i:i+32]]
+    fn CALLDATALOAD(&mut self);
 
     // /// Get size of input data in current environment
     // /// stack input - []
@@ -267,10 +267,10 @@ pub trait OPCODES {
     // /// stack output - blobBaseFee]
     // fn BLOBBASEFEE(&mut self);
 
-    // /// Remove item from stack
-    // /// stack input - y]
-    // /// stack output - []
-    // fn POP(&mut self);
+    /// Remove item from stack
+    /// stack input - y]
+    /// stack output - []
+    fn POP(&mut self);
 
     // /// Load word from memory
     // /// stack input - offset]

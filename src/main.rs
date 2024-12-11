@@ -4,32 +4,29 @@ mod tui;
 mod utils;
 
 use evm::EVM;
+use huff_core::Compiler;
+use huff_utils::evm_version::EVMVersion;
+use std::{
+    env,
+    io::{self, Result, Write},
+    process,
+    sync::Arc,
+};
 use structs::{
     calldata::Calldata, memory::Memory, opcodes::OPCODES, stack::Stack, storage::Storage,
 };
 use tui::render;
 
-use huff_core::Compiler;
-use huff_utils::evm_version::EVMVersion;
-use std::{
-    io::{self, Write},
-    sync::Arc,
-};
-
-fn main() -> io::Result<()> {
-    let mut file_path = String::new();
+fn main() -> Result<()> {
     let evm_version = EVMVersion::default();
-    let mut sources: Vec<String> = Vec::new();
+    let mut calldata = String::new();
     let mut compiled_bytecode = String::new();
 
-    print!("source: ");
+    print!("calldata: ");
     io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut calldata)?;
 
-    io::stdin()
-        .read_line(&mut file_path)
-        .expect("error: file read");
-    println!("file path: {}", file_path);
-    sources.push(file_path);
+    calldata = calldata.trim().to_string();
 
     let compiler = Compiler::new(
         &evm_version,                                    // EVM version
@@ -51,15 +48,23 @@ fn main() -> io::Result<()> {
 
         Err(error) => {
             println!("Error: {:?}", error);
+            process::exit(1)
         }
     }
 
-    let mut terminal = ratatui::init();
-    terminal.clear()?;
+    match Calldata::new(&calldata) {
+        Ok(instance) => {
+            let mut terminal = ratatui::init();
+            terminal.clear()?;
+            let mut execution_context = EVM::new(compiled_bytecode, instance, None, None, None);
+            let __ = render::render(terminal, &mut execution_context);
+            ratatui::restore();
+        }
+        Err(reason) => {
+            println!("{}", reason);
+            process::exit(1)
+        }
+    }
 
-    let mut execution_context = EVM::default(compiled_bytecode);
-    let __ = render::render(terminal, &mut execution_context);
-
-    ratatui::restore();
-    __
+    Ok(())
 }

@@ -30,8 +30,7 @@ impl Stack {
 
     pub fn pop(&mut self) -> Result<(), String> {
         self.undo_trace.push_back(self.trace.clone());
-        // remove element from stack
-
+        self.trace.pop();
         Ok(())
     }
 }

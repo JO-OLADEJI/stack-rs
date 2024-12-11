@@ -4,7 +4,7 @@ use crate::Stack;
 use crate::Storage;
 use crate::OPCODES;
 
-pub enum BytecodeExecutionTrail {
+pub enum ExecutionTrail {
     Left,
     Right,
 }
@@ -30,7 +30,7 @@ impl EVM {
             program_counter: 0,
             pc_history: Vec::new(),
             stack: Stack::new(),
-            memory: Memory::default(),
+            memory: Memory::new(),
             calldata: Calldata::default(),
             storage: Storage::default(),
         }
@@ -53,7 +53,7 @@ impl EVM {
             }
 
             None => {
-                defined_memory = Memory::default();
+                defined_memory = Memory::new();
             }
         }
 
@@ -101,13 +101,13 @@ impl EVM {
         self.command_length
     }
 
-    pub fn update_program_counter(&mut self, command: BytecodeExecutionTrail) {
+    pub fn update_program_counter(&mut self, command: ExecutionTrail) {
         let current_opcode = self.bytecode
             [self.program_counter..self.program_counter + self.command_length]
             .to_string();
 
         match command {
-            BytecodeExecutionTrail::Left => {
+            ExecutionTrail::Left => {
                 let prev_index = self.pc_history.last();
 
                 if let Some(value) = prev_index {
@@ -117,7 +117,7 @@ impl EVM {
                 }
             }
 
-            BytecodeExecutionTrail::Right => {
+            ExecutionTrail::Right => {
                 let res = self.execute_opcode(&current_opcode);
 
                 match res {
@@ -139,24 +139,22 @@ impl EVM {
 
 impl EVM {
     pub fn execute_opcode(&mut self, opcode: &str) -> Result<usize, ()> {
-        let payload_size: usize;
+        let mut payload_size = 0;
         let i = self.program_counter + self.command_length;
 
-        if opcode == "5f" {
-            self.PUSH0();
-            payload_size = 0;
-        } else if opcode == "63" {
-            payload_size = 8;
-            let payload = self.bytecode[i..i + payload_size].to_string();
-
-            self.PUSH4(&payload);
-        } else if opcode == "73" {
-            payload_size = 40;
-            let payload = self.bytecode[i..i + payload_size].to_string();
-
-            self.PUSH20(&payload);
-        } else {
-            payload_size = 0;
+        match opcode {
+            "35" => self.CALLDATALOAD(),
+            "50" => self.POP(),
+            "5f" => self.PUSH0(),
+            "63" => {
+                payload_size = 8;
+                self.PUSH4(&self.bytecode[i..i + payload_size].to_string());
+            }
+            "73" => {
+                payload_size = 40;
+                self.PUSH20(&self.bytecode[i..i + payload_size].to_string());
+            }
+            _ => (),
         }
 
         Ok(payload_size)
@@ -164,6 +162,14 @@ impl EVM {
 }
 
 impl OPCODES for EVM {
+    fn CALLDATALOAD(&mut self) {
+        //
+    }
+
+    fn POP(&mut self) {
+        let _ = self.stack.pop();
+    }
+
     fn PUSH0(&mut self) {
         let _ = self.stack.push(&String::from("0"));
     }

@@ -1477,6 +1477,7 @@ dependencies = [
  "huff_core",
  "huff_utils",
  "ratatui",
+ "regex",
 ]
 
 [[package]]
