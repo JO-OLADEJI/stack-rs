@@ -7,8 +7,7 @@ use evm::EVM;
 use huff_core::Compiler;
 use huff_utils::evm_version::EVMVersion;
 use std::{
-    env,
-    io::{self, Result, Write},
+    io::{self, Write},
     process,
     sync::Arc,
 };
@@ -17,27 +16,21 @@ use structs::{
 };
 use tui::render;
 
-fn main() -> Result<()> {
+fn main() {
     let evm_version = EVMVersion::default();
     let mut calldata = String::new();
     let mut compiled_bytecode = String::new();
 
-    print!("calldata: ");
-    io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut calldata)?;
-
-    calldata = calldata.trim().to_string();
-
     let compiler = Compiler::new(
-        &evm_version,                                    // EVM version
-        Arc::new(vec!["./playground.huff".to_string()]), // sources - file paths
-        None,                                            // output - file path
-        None,                                            // alternative `MAIN()` macro
-        None,                                            // alternative `CONSTRUCTOR()` macro
-        None,  // constructor arguments - for the generation of runtime code
-        None,  // constant overrides
-        false, // verbose ??
-        false, // check cached artifacts ??
+        &evm_version,
+        Arc::new(vec!["./playground.huff".to_string()]),
+        None,
+        None,
+        None,
+        None,
+        None,
+        false,
+        false,
     );
 
     let result = compiler.execute();
@@ -52,19 +45,15 @@ fn main() -> Result<()> {
         }
     }
 
-    match Calldata::new(&calldata) {
-        Ok(instance) => {
-            let mut terminal = ratatui::init();
-            terminal.clear()?;
-            let mut execution_context = EVM::new(compiled_bytecode, instance, None, None, None);
-            let __ = render::render(terminal, &mut execution_context);
-            ratatui::restore();
-        }
-        Err(reason) => {
-            println!("{}", reason);
-            process::exit(1)
-        }
-    }
+    print!("calldata: ");
+    io::stdout().flush().unwrap();
+    let _ = io::stdin().read_line(&mut calldata);
 
-    Ok(())
+    calldata = calldata.trim().to_string();
+
+    let mut terminal = ratatui::init();
+    let __ = terminal.clear();
+    let mut execution_context = EVM::new(compiled_bytecode, Calldata::new(&calldata));
+    let ___ = render::render(terminal, &mut execution_context);
+    ratatui::restore();
 }

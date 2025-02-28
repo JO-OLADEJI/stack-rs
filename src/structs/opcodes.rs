@@ -160,7 +160,7 @@ pub trait OPCODES {
     /// Get input data of current environment
     /// stack input - i]
     /// stack output - data[i:i+32]]
-    fn CALLDATALOAD(&mut self);
+    fn CALLDATALOAD(&mut self) -> usize;
 
     // /// Get size of input data in current environment
     // /// stack input - []
@@ -270,7 +270,7 @@ pub trait OPCODES {
     /// Remove item from stack
     /// stack input - y]
     /// stack output - []
-    fn POP(&mut self);
+    fn POP(&mut self) -> usize;
 
     // /// Load word from memory
     // /// stack input - offset]
@@ -345,167 +345,167 @@ pub trait OPCODES {
     /// Place 0 on stack
     /// stack input - []
     /// stack output - 0]
-    fn PUSH0(&mut self);
+    fn PUSH0(&mut self) -> usize;
 
     /// Place 1 byte item on stack
     /// stack input - []
     /// stack output - value]
-    fn PUSH1(&mut self, value: &str);
+    fn PUSH1(&mut self, value: &str) -> usize;
 
     /// Place 2 byte item on stack
     /// stack input - []
     /// stack output - value]
-    fn PUSH2(&mut self, value: &str);
+    fn PUSH2(&mut self, value: &str) -> usize;
 
     /// Place 3 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH3(&mut self, value: &str);
+    fn PUSH3(&mut self, value: &str) -> usize;
 
     /// Place 4 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH4(&mut self, value: &str);
+    fn PUSH4(&mut self, value: &str) -> usize;
 
     /// Place 5 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH5(&mut self, value: &str);
+    fn PUSH5(&mut self, value: &str) -> usize;
 
     /// Place 6 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH6(&mut self, value: &str);
+    fn PUSH6(&mut self, value: &str) -> usize;
 
     /// Place 7 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH7(&mut self, value: &str);
+    fn PUSH7(&mut self, value: &str) -> usize;
 
     /// Place 8 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH8(&mut self, value: &str);
+    fn PUSH8(&mut self, value: &str) -> usize;
 
     /// Place 9 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH9(&mut self, value: &str);
+    fn PUSH9(&mut self, value: &str) -> usize;
 
     /// Place 10 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH10(&mut self, value: &str);
+    fn PUSH10(&mut self, value: &str) -> usize;
 
     /// Place 11 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH11(&mut self, value: &str);
+    fn PUSH11(&mut self, value: &str) -> usize;
 
     /// Place 12 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH12(&mut self, value: &str);
+    fn PUSH12(&mut self, value: &str) -> usize;
 
     /// Place 13 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH13(&mut self, value: &str);
+    fn PUSH13(&mut self, value: &str) -> usize;
 
     /// Place 14 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH14(&mut self, value: &str);
+    fn PUSH14(&mut self, value: &str) -> usize;
 
     /// Place 15 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH15(&mut self, value: &str);
+    fn PUSH15(&mut self, value: &str) -> usize;
 
     /// Place 16 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH16(&mut self, value: &str);
+    fn PUSH16(&mut self, value: &str) -> usize;
 
     /// Place 17 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH17(&mut self, value: &str);
+    fn PUSH17(&mut self, value: &str) -> usize;
 
     /// Place 18 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH18(&mut self, value: &str);
+    fn PUSH18(&mut self, value: &str) -> usize;
 
     /// Place 19 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH19(&mut self, value: &str);
+    fn PUSH19(&mut self, value: &str) -> usize;
 
     /// Place 20 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH20(&mut self, value: &str);
+    fn PUSH20(&mut self, value: &str) -> usize;
 
     /// Place 221 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH21(&mut self, value: &str);
+    fn PUSH21(&mut self, value: &str) -> usize;
 
     /// Place 22 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH22(&mut self, value: &str);
+    fn PUSH22(&mut self, value: &str) -> usize;
 
     /// Place 23 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH23(&mut self, value: &str);
+    fn PUSH23(&mut self, value: &str) -> usize;
 
     /// Place 24 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH24(&mut self, value: &str);
+    fn PUSH24(&mut self, value: &str) -> usize;
 
     /// Place 25 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH25(&mut self, value: &str);
+    fn PUSH25(&mut self, value: &str) -> usize;
 
     /// Place 26 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH26(&mut self, value: &str);
+    fn PUSH26(&mut self, value: &str) -> usize;
 
     /// Place 27 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH27(&mut self, value: &str);
+    fn PUSH27(&mut self, value: &str) -> usize;
 
     /// Place 28 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH28(&mut self, value: &str);
+    fn PUSH28(&mut self, value: &str) -> usize;
 
     /// Place 29 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH29(&mut self, value: &str);
+    fn PUSH29(&mut self, value: &str) -> usize;
 
     /// Place 30 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH30(&mut self, value: &str);
+    fn PUSH30(&mut self, value: &str) -> usize;
 
     /// Place 31 byte item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH31(&mut self, value: &str);
+    fn PUSH31(&mut self, value: &str) -> usize;
 
     /// Place 32 byte (full word) item on stack
     /// stack input - []
     /// stack output value]
-    fn PUSH32(&mut self, value: &str);
+    fn PUSH32(&mut self, value: &str) -> usize;
 
     // /// Duplicate stack item
     // /// stack input - value]

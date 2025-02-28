@@ -1,21 +1,37 @@
-use crate::utils::operations::validate_calldata;
+use crate::utils::{
+    constants::Constants,
+    operations::{pad_32_bytes, validate_calldata},
+};
 
 #[derive(Debug)]
 pub struct Calldata {
-    buffer: String,
+    pub buffer: String,
 }
 
 impl Calldata {
     pub fn default() -> Calldata {
         Calldata {
-            buffer: String::from("0x"),
+            buffer: String::from(""),
         }
     }
 
-    pub fn new(value: &str) -> Result<Calldata, String> {
+    pub fn new(value: &str) -> Calldata {
         match validate_calldata(&value) {
-            Some(fmt_data) => Ok(Calldata { buffer: fmt_data }),
-            _ => Err(String::from("Invalid calldata")),
+            Some(fmt_data) => Calldata { buffer: fmt_data },
+            // TODO: add an option for a flag to terminate process if calldata is invalid
+            None => Calldata {
+                buffer: String::from(""),
+            },
+        }
+    }
+
+    pub fn read(&self, bytes_index: usize) -> String {
+        let raw_buffer = &self.buffer;
+
+        if raw_buffer.len() < (bytes_index * Constants::BYTE_SIZE()) {
+            pad_32_bytes("")
+        } else {
+            pad_32_bytes(&raw_buffer[bytes_index * Constants::BYTE_SIZE()..])
         }
     }
 }

@@ -35,7 +35,7 @@ pub fn render(mut terminal: DefaultTerminal, execution_context: &mut EVM) -> io:
             ]))
             .block(
                 Block::bordered()
-                    .title("  bytecode ")
+                    .title("  Bytecode(runtime) ")
                     .title_alignment(Alignment::Center)
                     .title_style(Style::new().bold())
                     .padding(Padding::horizontal(2)),

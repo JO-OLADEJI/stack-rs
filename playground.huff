@@ -11,9 +11,13 @@
 // #define constant BALANCES_SLOT = 0x01
 
 #define macro MAIN() = takes(0) returns(0) {
+    0x04
+    calldataload
     0x00
-    0xab12cd34
-    0xb2052Eb9730b6AfEc7ae47B5bfFE492c0c0E511b
+
+    // 0xab12cd34
+    // 0xb2052Eb9730b6AfEc7ae47B5bfFE492c0c0E511b
+
     pop
     pop
 
