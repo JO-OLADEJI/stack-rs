@@ -1,4 +1,5 @@
 use crate::{evm::EVM, utils::constants::Constants};
+use num_bigint::BigUint;
 
 pub fn pad_32_bytes(value: &str) -> String {
     if value.len() > Constants::BYTES_32_SIZE() {
@@ -14,6 +15,7 @@ pub fn pad_32_bytes(value: &str) -> String {
 }
 
 pub fn validate_calldata(value: &str) -> Option<String> {
+    // TODO: handle function dispatcher bug when calldata is 4 bytes (func selector)
     let mut raw_calldata = String::from("");
 
     if value.is_empty() {
@@ -39,11 +41,29 @@ pub fn get_payload(execution_context: &EVM, bytes_count: usize) -> String {
         .to_string()
 }
 
-pub fn convert_hex_to_dec(hex_str: &str) -> usize {
-    if let Ok(value) = usize::from_str_radix(hex_str, 16) {
+pub fn convert_hex_to_dec(hex: &str) -> usize {
+    if let Ok(value) = usize::from_str_radix(hex, 16) {
         return value;
     } else {
         // TODO: this should throw an error
         return 0;
     }
+}
+
+pub fn convert_hex_to_biguint(hex: &str) -> BigUint {
+    if Constants::HEX_REGEX().is_match(&hex) {
+        let char_vec: Vec<char> = hex.chars().collect();
+        let u8_vec: Vec<u8> = char_vec
+            .iter()
+            .filter_map(|byte| u8::from_str_radix(&byte.to_string(), 16).ok())
+            .collect();
+
+        return BigUint::from_radix_be(&u8_vec, 16).unwrap();
+    }
+    // TODO: this should throw an error
+    return BigUint::ZERO;
+}
+
+pub fn convert_biguint_to_hex(value: &BigUint) -> String {
+    return value.to_str_radix(16);
 }

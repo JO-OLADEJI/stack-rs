@@ -117,10 +117,10 @@ pub trait OPCODES {
     // /// stack output - value << shift]
     // fn SHL(&mut self);
 
-    // /// Right shift operation
-    // /// Stack input - shift, value]
-    // /// stack output - value >> shift]
-    // fn SHR(&mut self);
+    /// Right shift operation
+    /// Stack input - shift, value]
+    /// stack output - value >> shift]
+    fn SHR(&mut self) -> usize;
 
     // /// Arithmetic (signed) right shift operation
     // /// Stack input - shift, value]

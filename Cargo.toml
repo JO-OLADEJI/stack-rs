@@ -8,3 +8,4 @@ huff_utils = { path = "huff-rs/huff_utils" }
 huff_core = { path = "huff-rs/huff_core" }
 ratatui = "0.29.0"
 regex = "1.11.1"
+num-bigint = "0.4.6"

@@ -34,21 +34,11 @@ impl Stack {
         Ok(())
     }
 
-    // pub fn get_nth_element_from_top(&self, index: usize) -> Option<String> {
-    //     // TODO: modify this to use the index parameter
-    //     if let Some(top_value) = self.trace.last() {
-    //         return Some(top_value.to_string());
-    //     } else {
-    //         return None;
-    //     }
-    // }
-
-    pub fn get_top_element(&self) -> Option<String> {
-        if let Some(top_value) = self.trace.last() {
-            return Some(top_value.to_string());
-        } else {
-            return None;
+    pub fn get_nth_element_from_top(&self, index: usize) -> Option<String> {
+        if let Some(value) = self.trace.get(self.trace.len() - index - 1) {
+            return Some(value.to_string());
         }
+        None
     }
 
     pub fn replace(&mut self, del_count: usize, values: Vec<String>) -> Result<(), String> {

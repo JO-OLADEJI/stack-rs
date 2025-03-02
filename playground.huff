@@ -11,18 +11,25 @@
 // #define constant BALANCES_SLOT = 0x01
 
 #define macro MAIN() = takes(0) returns(0) {
-    0x04
-    calldataload
-    0x00
+    0x00                            // [0x00
+    calldataload                    // [calldata[00:32]
+    0xe0                            // [calldata[00:32], 0xe0
+    shr                             // [func_selector
 
-    // 0xab12cd34
-    // 0xb2052Eb9730b6AfEc7ae47B5bfFE492c0c0E511b
+    // dup1                            // [func_selector, func_selector
+    // __FUNC_SIG(deposit)             // [func_selector, func_selector, 0xd0e30db0
+    // eq                              // [func_selector, func_selector == 0xd0e30db0
+    // deposit                         // [func_selector, func_selector == 0xd0e30db0, deposit()-DEST
+    // jumpi                           // [func_selector
 
-    pop
-    pop
+    // deposit: DEPOSIT()
 
     stop
 }
+
+// #define macro DEPOSIT() = takes(0) returns(0) {
+//     //
+// }
 
 // #define macro CONSTRUCTOR() = takes(0) returns (0) {
 //     caller

@@ -1,12 +1,16 @@
 use crate::utils::{
     constants::Constants,
-    operations::{convert_hex_to_dec, get_payload},
+    operations::{
+        convert_biguint_to_hex, convert_hex_to_biguint, convert_hex_to_dec, get_payload,
+        pad_32_bytes,
+    },
 };
 use crate::Calldata;
 use crate::Memory;
 use crate::Stack;
 use crate::Storage;
 use crate::OPCODES;
+use num_bigint::BigUint;
 
 pub enum ExecutionTrail {
     Left,
@@ -108,6 +112,7 @@ impl EVM {
 impl EVM {
     pub fn execute_opcode(&mut self, opcode: &str) -> Result<usize, ()> {
         match opcode {
+            "1c" => return Ok(self.SHR()),
             "35" => return Ok(self.CALLDATALOAD()),
             "50" => return Ok(self.POP()),
             "5f" => return Ok(self.PUSH0()),
@@ -137,10 +142,39 @@ impl EVM {
 }
 
 impl OPCODES for EVM {
-    fn CALLDATALOAD(&mut self) -> usize {
-        // index is meant to be read from the stack
+    fn SHR(&mut self) -> usize {
+        let shift_factor: usize;
+        let value_to_shift: BigUint;
+        let shifted_value: String;
 
-        if let Some(offset_from_stack) = self.stack.get_top_element() {
+        match self.stack.get_nth_element_from_top(0) {
+            Some(x) => shift_factor = convert_hex_to_dec(&x),
+            None => {
+                // TODO: this should panic
+                shift_factor = 0;
+            }
+        }
+
+        match self.stack.get_nth_element_from_top(1) {
+            Some(y) => value_to_shift = convert_hex_to_biguint(&y),
+            None => {
+                // TODO: this should panic
+                value_to_shift = BigUint::ZERO;
+            }
+        }
+
+        if shift_factor > u8::MAX as usize {
+            shifted_value = String::from("0");
+        } else {
+            shifted_value = convert_biguint_to_hex(&(value_to_shift >> shift_factor));
+        }
+        let _ = self.stack.replace(2, vec![pad_32_bytes(&shifted_value)]);
+
+        return 0;
+    }
+
+    fn CALLDATALOAD(&mut self) -> usize {
+        if let Some(offset_from_stack) = self.stack.get_nth_element_from_top(0) {
             let _ = self.stack.replace(
                 1,
                 vec![self.calldata.read(convert_hex_to_dec(&offset_from_stack))],
